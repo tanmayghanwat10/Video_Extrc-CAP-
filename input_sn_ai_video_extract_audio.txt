@@ -1,0 +1,4 @@
+video_path: ./Input/sample_3_caption.mp4
+subtitle_path: ./output/subtitles.srt
+output_path: ./output/output.txt
+keep_audio: true
