@@ -22,8 +22,8 @@ A Dockerized video moderator application that extracts subtitles (speech-to-text
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/sn_ai_video_extract_audio.git
-cd sn_ai_video_extract_audio
+git clone https://github.com/tanmayghanwat10/Video_Extrc-CAP-.git
+cd Video_Extrc-CAP-
 ```
 
 ### 2. Configure Input File
