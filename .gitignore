@@ -4,6 +4,7 @@ __pycache__/
 *.pyd
 .Python
 env/
+venv/
 build/
 develop-eggs/
 dist/
