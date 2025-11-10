@@ -68,16 +68,17 @@ Outputs will be written to the `output/` directory:
 
 The script now supports a `keep_audio` flag in `input_sn_ai_video_extract_audio.txt` to control whether the extracted audio file is removed after transcription. By default the README example sets it to `false` to save disk space; set it to `true` if you want to keep the audio file for inspection or further processing.
 
-### Docker Usage (Primary Method)
+### Docker Usage on Windows (Primary Method)
 
-The application is designed to run in Docker for maximum compatibility. Use the provided shell script to start the process:
+The application is designed to run in Docker for maximum compatibility. For Windows users:
 
-```bash
-# Make the script executable (Unix/Linux/macOS)
-chmod +x sn_ai_video_extract_audio.sh
+1. Install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop)
+2. Make sure Docker Desktop is running
+3. Open PowerShell and run:
 
-# Run the application
-./sn_ai_video_extract_audio.sh
+```powershell
+# Run the application using PowerShell script
+.\run_video_extract.ps1
 ```
 
 The shell script will:
@@ -108,5 +109,4 @@ docker run --rm \
 - Whisper may download model weights the first time it runs. That may take extra time and disk space.
 
 ### License & Attribution
-
-This project uses OpenAI Whisper (open-source) for speech-to-text. Check their license for details.
+- Tanmay Ghanwat
