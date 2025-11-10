@@ -87,8 +87,6 @@ def main():
     video_path = config.get('video_path')
     subtitle_path = config.get('subtitle_path')
     output_path = config.get('output_path')
-    # Optional: whether to keep the extracted audio file. Set to 'true' to keep.
-    keep_audio = config.get('keep_audio', 'false').lower() == 'true'
     
     if not all([video_path, subtitle_path, output_path]):
         print("Missing required configuration parameters")
@@ -98,37 +96,35 @@ def main():
     start_time = datetime.now()
     start_time_str = start_time.strftime('%d/%m/%Y %H:%M:%S')
     log_time(output_path, start_time_str, mode='w')
-    
+
     print(f"=== Starting Video Audio Extraction ===")
     print(f"Start Time: {start_time_str}")
-    
+
     # Extract audio
     temp_audio = 'output/extracted_audio.wav'
     if not extract_audio_from_video(video_path, temp_audio):
         print("Failed to extract audio")
         sys.exit(1)
-    
+
     # Generate subtitles
     if not generate_subtitles(temp_audio, subtitle_path):
         print("Failed to generate subtitles")
         sys.exit(1)
-    
+
     # Record end time
     end_time = datetime.now()
     end_time_str = end_time.strftime('%d/%m/%Y %H:%M:%S')
     log_time(output_path, end_time_str)
-    
+
     # Calculate execution time
     execution_time = (end_time - start_time).total_seconds()
-    
+
     print(f"End Time: {end_time_str}")
     print(f"=== Total Execution Time: {execution_time:.2f} seconds ===")
-    
-    # Cleanup (remove temp audio unless user asked to keep it)
-    if os.path.exists(temp_audio) and not keep_audio:
+
+    # Cleanup (remove temp audio)
+    if os.path.exists(temp_audio):
         os.remove(temp_audio)
-    elif os.path.exists(temp_audio) and keep_audio:
-        print(f"Extracted audio saved at: {temp_audio}")
 
 if __name__ == '__main__':
     main()

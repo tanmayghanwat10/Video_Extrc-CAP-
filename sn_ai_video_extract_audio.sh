@@ -32,11 +32,6 @@ VIDEO_PATH=$(grep "video_path" "$INPUT_FILE" | cut -d':' -f2- | xargs)
 SUBTITLE_PATH=$(grep "subtitle_path" "$INPUT_FILE" | cut -d':' -f2- | xargs)
 OUTPUT_PATH=$(grep "output_path" "$INPUT_FILE" | cut -d':' -f2- | xargs)
 
-# Get directories for volume mounting
-VIDEO_DIR=$(dirname "$VIDEO_PATH")
-SUBTITLE_DIR=$(dirname "$SUBTITLE_PATH")
-OUTPUT_DIR=$(dirname "$OUTPUT_PATH")
-
 echo "Configuration:"
 echo "  Video: $VIDEO_PATH"
 echo "  Subtitle: $SUBTITLE_PATH"
@@ -46,10 +41,8 @@ echo ""
 # Run Docker container
 echo "Starting Docker container..."
 docker run --rm \
-    -v "$VIDEO_DIR:/video:ro" \
-    -v "$SUBTITLE_DIR:/subtitles" \
-    -v "$OUTPUT_DIR:/output" \
-    -v "$(pwd)/$INPUT_FILE:/app/input_sn_ai_video_extract_audio.txt:ro" \
+    -v "$(pwd)/Input:/app/Input:ro" \
+    -v "$(pwd)/output:/app/output" \
     sn_ai_video_extract_audio
 
 if [ $? -eq 0 ]; then
