@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    image: video_extrc_cap:latest
+    container_name: video_extrc_cap
+    environment:
+      - MODE=web
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./Input:/app/Input
+      - ./output:/app/output
+      - ./scripts:/app/scripts
+      - ./input_sn_ai_video_extract_audio.txt:/app/input_sn_ai_video_extract_audio.txt:ro
+    restart: unless-stopped

@@ -93,14 +93,23 @@ You can also run the Docker commands manually:
 
 ```bash
 # Build the image
-docker build -t sn_ai_video_extract_audio .
+docker build -t video_extrc_cap .
 
 # Run the container
 docker run --rm \
+  -e MODE=cli \
   -v "$(pwd)/input_sn_ai_video_extract_audio.txt:/app/input_sn_ai_video_extract_audio.txt:ro" \
-  -v "$(pwd)/Input:/video:ro" \
-  -v "$(pwd)/output:/output" \
-  sn_ai_video_extract_audio
+  -v "$(pwd)/Input:/app/Input" \
+  -v "$(pwd)/output:/app/output" \
+  video_extrc_cap
+
+# Run the web UI (exposes port 5000)
+docker run --rm -p 5000:5000 \
+  -e MODE=web \
+  -v "$(pwd)/input_sn_ai_video_extract_audio.txt:/app/input_sn_ai_video_extract_audio.txt:ro" \
+  -v "$(pwd)/Input:/app/Input" \
+  -v "$(pwd)/output:/app/output" \
+  video_extrc_cap
 ```
 
 ### Notes

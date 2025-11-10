@@ -1,42 +1,51 @@
-FROM python:3.10-windowsservercore
+FROM python:3.10-slim
 
-# Add metadata labels
+# -------------------- Metadata --------------------
 LABEL maintainer="tanmayghanwat17@gmail.com" \
-      description="Video subtitle extraction using Whisper AI" \
+      org.opencontainers.image.title="sn_ai_video_extract_audio" \
+      org.opencontainers.image.description="Extract subtitles from videos using Whisper; supports CLI and web modes." \
       version="1.0"
 
-# Download and install FFmpeg for Windows
-RUN powershell -Command \
-    Invoke-WebRequest -Uri https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip -OutFile ffmpeg.zip ; \
-    Expand-Archive ffmpeg.zip -DestinationPath C:\ ; \
-    Move-Item C:\ffmpeg-*\bin\ffmpeg.exe C:\Windows\System32\ ; \
-    Remove-Item ffmpeg.zip ; \
-    Remove-Item -Recurse C:\ffmpeg-*
+# -------------------- Arguments / Env --------------------
+ARG USER=appuser
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    POETRY_VIRTUALENVS_CREATE=false
 
-# Set working directory
+# -------------------- System deps --------------------
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        ffmpeg \
+        git \
+        curl \
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# -------------------- Create user and workdir --------------------
+RUN useradd -m -s /bin/bash ${USER}
 WORKDIR /app
+RUN chown ${USER}:${USER} /app
 
-# Install Python dependencies first (better layer caching)
-COPY requirements.txt .
-RUN pip install --no-cache-dir --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --trusted-host pypi.org -r requirements.txt && \
-    rm -rf ~/.cache/pip
+# -------------------- Install Python deps (cached layer) --------------------
+COPY requirements.txt /app/requirements.txt
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir --prefer-binary -r /app/requirements.txt
 
-# Create necessary directories
-RUN mkdir -p /video /subtitles /output
+# -------------------- Application files --------------------
+COPY . /app
+RUN chmod +x /app/sn_ai_video_extract_audio.sh || true
+RUN mkdir -p /app/scripts && chown -R ${USER}:${USER} /app/scripts /app/Input /app/output
 
-# Copy application files
-COPY extract_audio.py .
-COPY input_sn_ai_video_extract_audio.txt .
+# -------------------- Expose ports and volumes --------------------
+EXPOSE 5000
+VOLUME ["/app/Input", "/app/output", "/app/scripts"]
 
-# Volume mount points
-VOLUME ["/video", "/subtitles", "/output"]
+# -------------------- Entrypoint --------------------
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Healthcheck to verify the container is ready
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import os; exit(0 if os.path.exists('/app/extract_audio.py') else 1)"
-
-# Set Python to run in unbuffered mode (better logging)
-ENV PYTHONUNBUFFERED=1
-
-# Run the application
-CMD ["python", "extract_audio.py"]
+USER ${USER}
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["--help"]
