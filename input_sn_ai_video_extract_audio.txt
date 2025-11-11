@@ -1,3 +1,3 @@
-video_path : ./Input/Sample_10.mp4
+video_path : ./Input/Sample_2.mp4
 subtitle_path : ./output/subtitles.srt
 output_path : ./output/output.txt
